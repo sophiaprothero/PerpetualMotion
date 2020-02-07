@@ -59,8 +59,9 @@ class MyApp(App):
         self.title = "Perpetual Motion"
         return sm
 
+
 Builder.load_file('main.kv')
-Window.clearcolor = (.1, .1,.1, 1) # (WHITE)
+Window.clearcolor = (1, 1, 1, 1) # (WHITE)
 
 cyprus.open_spi()
 
@@ -74,7 +75,7 @@ ramp = stepper(port = 0, speed = INIT_RAMP_SPEED)
 # //                       MAIN FUNCTIONS                       //
 # //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
 # ////////////////////////////////////////////////////////////////
-	
+
 # ////////////////////////////////////////////////////////////////
 # //        DEFINE MAINSCREEN CLASS THAT KIVY RECOGNIZES        //
 # //                                                            //
@@ -84,6 +85,8 @@ ramp = stepper(port = 0, speed = INIT_RAMP_SPEED)
 # //   SHOULD REFERENCE MAIN FUNCTIONS WITHIN THESE FUNCTIONS   //
 # //      SHOULD NOT INTERACT DIRECTLY WITH THE HARDWARE        //
 # ////////////////////////////////////////////////////////////////
+
+
 class MainScreen(Screen):
     version = cyprus.read_firmware_version()
     staircaseSpeedText = '0'
@@ -124,6 +127,7 @@ class MainScreen(Screen):
     def quit(self):
         print("Exit")
         MyApp().stop()
+
 
 sm.add_widget(MainScreen(name = 'main'))
 
