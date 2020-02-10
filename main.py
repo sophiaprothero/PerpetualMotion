@@ -78,28 +78,18 @@ cyprus.open_spi()
 sm = ScreenManager()
 ramp = stepper(port=0, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20, steps_per_unit=200, speed=INIT_RAMP_SPEED)
 
-# ////////////////////////////////////////////////////////////////
-# //                       MAIN FUNCTIONS                       //
-# //             SHOULD INTERACT DIRECTLY WITH HARDWARE         //
-# ////////////////////////////////////////////////////////////////
-
-# ////////////////////////////////////////////////////////////////
-# //        DEFINE MAINSCREEN CLASS THAT KIVY RECOGNIZES        //
-# //                                                            //
-# //   KIVY UI CAN INTERACT DIRECTLY W/ THE FUNCTIONS DEFINED   //
-# //     CORRESPONDS TO BUTTON/SLIDER/WIDGET "on_release"       //
-# //                                                            //
-# //   SHOULD REFERENCE MAIN FUNCTIONS WITHIN THESE FUNCTIONS   //
-# //      SHOULD NOT INTERACT DIRECTLY WITH THE HARDWARE        //
-# ////////////////////////////////////////////////////////////////
+# ////////////////////////////////////////////////////////////////////////////////
+# ///                              Main Screen                                 ///
+# ////////////////////////////////////////////////////////////////////////////////
 
 
 class MainScreen(Screen):
     version = cyprus.read_firmware_version()
     staircaseSpeedText = '0'
-    rampSpeed = INIT_RAMP_SPEED
+    global rspeed
     global sspeed
     sspeed = 0.5
+    rspeed = 3.5
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -115,6 +105,11 @@ class MainScreen(Screen):
             if self.staircase.text == "Start Staircase":
                 return 'Off'
             elif self.staircase.text == "Stop Staircase":
+                return 'On'
+        elif mod == 'ramp':
+            if self.ramp.text == "Ramp Up":
+                return 'Off'
+            elif self.ramp.text == "Ramp Down":
                 return 'On'
     # checks states
 
@@ -143,33 +138,41 @@ class MainScreen(Screen):
         if self.check_text('staircase') == 'Off':
             pass
         elif self.check_text('staircase') == 'On':
+            self.staircaseSpeedLabel.text = speedy
             cyprus.set_motor_speed(1, speedy)
             sspeed = speedy
+
     # updates speed value based on slider
 
     def toggle_ramp(self):
-    #    ramp.set_speed(50)
-    #    ramp.relative_move(725)
+        if self.check_text('ramp') == 'Off':
+            self.ramp.text = "Ramp Down"
+            self.move_ramp()
+        elif self.check_text('ramp') == 'On':
+            self.ramp.text = "Ramp Up"
+            self.move_ramp()
+
+    @staticmethod
+    def move_ramp():
+        ramp.set_speed(3.5)
+        ramp.free()
 
         if ramp.read_switch() == 1:
-            print("hi")
-            ramp.go_to_position(56.5)
-        elif ramp.get_position_in_units() == 56.5:
+            ramp.go_to_position(30)
+            ramp.free()
+        elif ramp.get_position_in_units() == 30:
             axis1.goTo(0)
-            print("bye")
 
         else:
-            while (axis1.isBusy()):
+            while axis1.isBusy():
                 continue
-            axis1.goUntilPress(0, 0, 5000)  # spins until hits a NO limit at speed 1000 and direction 1
+            axis1.goUntilPress(0, 0, 5000)
 
-            while (axis1.isBusy()):
+            while axis1.isBusy():
                 continue
-            axis1.setAsHome()  # set the position for 0 for all go to commands
+            axis1.setAsHome()
 
-            ramp.set_speed(3)
-
-        print("Move ramp up and down here")
+            ramp.set_speed(3.5)
         
     def auto(self):
         print("Run through one cycle of the perpetual motion machine")
@@ -177,11 +180,13 @@ class MainScreen(Screen):
     def setRampSpeed(self, speed):
         print("Set the ramp speed and update slider text")
 
-        
+
+
+
     @staticmethod
     def initialize():
         ramp.free()
-        ramp.set_speed(50)
+        ramp.set_speed(3.5)
         cyprus.initialize()
         cyprus.setup_servo(2)
         cyprus.set_motor_speed(1, 0)
@@ -192,9 +197,12 @@ class MainScreen(Screen):
         self.ids.staircase.color = YELLOW
         self.ids.ramp.color = YELLOW
         self.ids.auto.color = BLUE
-    
-    def quit(self):
+
+    @staticmethod
+    def quit():
         print("Exit")
+        ramp.free()
+        cyprus.close()
         MyApp().stop()
 
 
