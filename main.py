@@ -98,7 +98,8 @@ class MainScreen(Screen):
     version = cyprus.read_firmware_version()
     staircaseSpeedText = '0'
     rampSpeed = INIT_RAMP_SPEED
-    staircaseSpeed = 40
+    global sspeed
+    sspeed = 0.5
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -127,14 +128,25 @@ class MainScreen(Screen):
     # changes gate state
 
     def toggle_staircase(self):
+        global sspeed
         if self.check_text('staircase') == 'Off':
             self.staircase.text = "Stop Staircase"
-            cyprus.set_motor_speed(1, 0.5)
+            cyprus.set_motor_speed(1, sspeed)
         elif self.check_text('staircase') == 'On':
             self.staircase.text = "Start Staircase"
             cyprus.set_motor_speed(1, 0)
     # changes staircase state
-        
+
+    def set_staircase_speed(self, speedy):
+        global sspeed
+        cyprus.set_motor_speed(1, 0)
+        if self.check_text('staircase') == 'Off':
+            pass
+        elif self.check_text('staircase') == 'On':
+            cyprus.set_motor_speed(1, speedy)
+            sspeed = speedy
+    # updates speed value based on slider
+
     def toggle_ramp(self):
     #    ramp.set_speed(50)
     #    ramp.relative_move(725)
@@ -164,19 +176,15 @@ class MainScreen(Screen):
         
     def setRampSpeed(self, speed):
         print("Set the ramp speed and update slider text")
-        
-    def setStaircaseSpeed(self, speed):
-        print("Set the staircase speed and update slider text")
+
         
     @staticmethod
     def initialize():
         ramp.free()
         ramp.set_speed(50)
         cyprus.initialize()
-        #   cyprus.setup_servo(1)
         cyprus.setup_servo(2)
         cyprus.set_motor_speed(1, 0)
-        #cyprus.set_pwm_values(1, period_value=100000, compare_value=0, compare_mode=cyprus.LESS_THAN_OR_EQUAL)
         cyprus.set_servo_position(2, 0)
 
     def resetColors(self):
