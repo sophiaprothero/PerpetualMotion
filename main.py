@@ -153,7 +153,6 @@ class MainScreen(Screen):
 
     @staticmethod
     def move_ramp():
-        ramp.set_speed(2)
         ramp.free()
 
         if ramp.read_switch() == 1:
@@ -171,16 +170,32 @@ class MainScreen(Screen):
                 continue
             axis1.setAsHome()
 
-            ramp.set_speed(3)
-        
+    def set_ramp_speed(self, speedz):
+        global rspeed
+        cyprus.set_motor_speed(1, 0)
+        if self.check_text('ramp') == 'Off':
+            pass
+        elif self.check_text('ramp') == 'On':
+            cyprus.set_motor_speed(1, speedz)
+            rspeed = speedz
+
     def auto(self):
-        print("Run through one cycle of the perpetual motion machine")
-        
-    def setRampSpeed(self, speed):
-        print("Set the ramp speed and update slider text")
+        ramp.set_speed(3.5)
+        cyprus.set_servo_position(2, 0)
+        cyprus.set_motor_speed(1, 0)
+        Clock.schedule_once(lambda dt: self.move_ramp(), 0.01)
+        Clock.schedule_once(lambda dt: self.part2(), 10)
+        Clock.schedule_once(lambda dt: self.part3(), 17)
 
+    @staticmethod
+    def part2():
+        ramp.goHome()
+        cyprus.set_motor_speed(1, 1)
 
-
+    @staticmethod
+    def part3():
+        cyprus.set_motor_speed(1, 0)
+        cyprus.set_servo_position(2, 0.5)
 
     @staticmethod
     def initialize():
