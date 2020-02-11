@@ -89,7 +89,7 @@ class MainScreen(Screen):
     global rspeed
     global sspeed
     sspeed = 0.5
-    rspeed = 3.5
+    rspeed = 2
 
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -138,7 +138,6 @@ class MainScreen(Screen):
         if self.check_text('staircase') == 'Off':
             pass
         elif self.check_text('staircase') == 'On':
-            self.staircaseSpeedLabel.text = speedy
             cyprus.set_motor_speed(1, speedy)
             sspeed = speedy
 
@@ -154,13 +153,13 @@ class MainScreen(Screen):
 
     @staticmethod
     def move_ramp():
-        ramp.set_speed(3.5)
+        ramp.set_speed(2)
         ramp.free()
 
         if ramp.read_switch() == 1:
-            ramp.go_to_position(30)
+            ramp.go_to_position(29)
             ramp.free()
-        elif ramp.get_position_in_units() == 30:
+        elif ramp.get_position_in_units() == 29:
             axis1.goTo(0)
 
         else:
@@ -172,7 +171,7 @@ class MainScreen(Screen):
                 continue
             axis1.setAsHome()
 
-            ramp.set_speed(3.5)
+            ramp.set_speed(3)
         
     def auto(self):
         print("Run through one cycle of the perpetual motion machine")
