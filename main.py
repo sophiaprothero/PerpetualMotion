@@ -184,11 +184,12 @@ class MainScreen(Screen):
         cyprus.set_servo_position(2, 0)
         cyprus.set_motor_speed(1, 0)
         Clock.schedule_once(lambda dt: self.move_ramp(), 0.01)
-        Clock.schedule_once(lambda dt: self.part2(), 10)
-        Clock.schedule_once(lambda dt: self.part3(), 17)
+        Clock.schedule_once(lambda dt: self.part2(), 9)
+        Clock.schedule_once(lambda dt: self.part3(), 18)
 
     @staticmethod
     def part2():
+        ramp.set_speed(3.5)
         ramp.goHome()
         cyprus.set_motor_speed(1, 1)
 
